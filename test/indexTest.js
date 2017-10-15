@@ -1,80 +1,124 @@
 const expect = chai.expect;
 
-
-describe('index', function() {
-  describe('returnFirstTwoDrivers()', function () {
-    it('should return an array of the first two drivers', function () {
-      expect(returnFirstTwoDrivers(['sally', 'bob', 'freddy', 'claudia'])).to.eql(['sally', 'bob'])
-    });
-
-    it('should be set to a constant', function () {
-      expect(() => { returnFirstTwoDrivers = function(){ return 'new function'}} ).to.throw(TypeError)
-    });
-  });
-
-  describe('`returnLastTwoDrivers` function', function () {
-    it('should return an array of the last two drivers', function () {
-      expect(returnLastTwoDrivers(['sally', 'bob', 'freddy', 'claudia'])).to.eql(['freddy', 'claudia'])
-    });
-
-    it('should be set to a constant', function () {
-      expect(() => { returnLastTwoDrivers = function(){ return 'new function'}} ).to.throw(TypeError)
-    });
-  });
-
-  describe('selectingDrivers', function () {
-    it('is an array (so it naturally responds to the `slice` method)', function () {
-      expect(selectingDrivers.slice).to.equal(Array.prototype.slice)
-    });
-
-    it('has the `returnFirstTwoDrivers` function to as its first element', function () {
-      expect(selectingDrivers[0]).to.eql(returnFirstTwoDrivers)
-    });
-
-    it('has the `returnLastTwoDrivers` function to as its last element', function () {
-      expect(selectingDrivers[selectingDrivers.length-1]).to.eql(returnLastTwoDrivers)
-    });
-
-    it('allows us to invoke either function from the array', function () {
-      let drivers = ['sally', 'bob', 'freddy', 'claudia']
-      expect(selectingDrivers[0](drivers)).to.eql(['sally', 'bob'])
-      expect(selectingDrivers[1](drivers)).to.eql(['freddy', 'claudia'])
-    });
-  });
-
-  describe('`createFareMultiplier` function', function () {
-    it('should return a function', function () {
-      const doubler = createFareMultiplier(2);
-      expect(doubler).to.be.a('function');
-    });
-
-    it('should multiply a given value using the created multiplier', function () {
-      const fareDoubler = createFareMultiplier(2);
-      expect(fareDoubler(5)).to.equal(10);
-    });
-  });
-
-  describe('FareMultiplier functions created with `createFareMultiplier`', function () {
-    it('should have a doubler function', function () {
-      expect(fareDoubler).to.be.a('function');
-      expect(fareDoubler(5)).to.equal(10);
-    });
-
-    it('should have a tripler function', function () {
-      expect(fareTripler).to.be.a('function');
-      expect(fareTripler(5)).to.equal(15);
-    });
-  });
-
-  describe('`selectDifferentDrivers(drivers, whichDrivers)` function', function(){
-    it('returns the first two drivers when passed through the `returnFirstTwoDrivers` as the second argument', function () {
-      let drivers = ['sally', 'bob', 'freddy', 'claudia']
-      expect(selectDifferentDrivers(drivers, returnFirstTwoDrivers)).to.eql(['sally', 'bob'])
-    });
-
-    it('returns the last two drivers when passed through the `returnLastTwoDrivers` as the second argument', function () {
-      let drivers = ['sally', 'bob', 'freddy', 'claudia']
-      expect(selectDifferentDrivers(drivers, returnLastTwoDrivers)).to.eql(['freddy', 'claudia'])
-    });
+describe('index', () => {
+  describe('appendQuestion', () => {
+    let question = questions[0]
+    it('appends the question to the question-container', function(){
+      appendQuestion(question)
+      expect(document.querySelector('.question-container').innerHTML).to.eq('Lightning never strikes in the same place twice')
+    })
   })
-});
+
+  describe('askQuestionThen', () => {
+    let questionContainer;
+
+    beforeEach(function () {
+      questionContainer = document.querySelector('.question-container')
+     });
+
+    it('should have question start off as undefined', () => {
+      expect(question).to.eq(undefined)
+    })
+
+    it("should assign a global variable question to equal a question", function() {
+      askQuestionThen()
+      expect(question.answer).to.be.a('boolean')
+    })
+
+    it('should append the question', function(){
+      askQuestionThen()
+      expect(document.querySelector('.question-container').innerHTML).to.eq('Lightning never strikes in the same place twice')
+    })
+
+    it('should return a promise', function(){
+      expect(askQuestionThen()).to.be.a('promise')
+    })
+  })
+
+  describe('removeQuestion', () => {
+    let question = questions[0]
+
+    it('removes the question to the question-container', function(){
+      appendQuestion(question)
+      expect(document.querySelector('.question-container').innerHTML).to.eq('Lightning never strikes in the same place twice')
+      removeQuestion()
+      expect(document.querySelector('.question-container').innerHTML).to.eq('')
+    })
+  })
+
+  describe('askQuestionThenRemoveQuestion', function(){
+    let questionContainer;
+    let removeQuestionSpy
+    beforeEach(function () {
+      questionContainer = document.querySelector('.question-container')
+     });
+
+    it('should append the question for 10 seconds and then remove the question when the promise resolves', function(){
+      let resolvingPromise = askQuestionThenRemoveQuestion(1000)
+      expect(questionContainer.innerHTML).to.eq("Lightning never strikes in the same place twice")
+      resolvingPromise.then( (result) => {
+          expect(questionContainer.innerHTML).to.equal('');
+      })
+    })
+  })
+
+  describe('trueAndFalseButtons', function(){
+    it('selects and returns the true and false buttons in the index.html file', function(){
+      expect(trueAndFalseButtons().length).to.eq(2)
+      expect(trueAndFalseButtons()[0].innerText).to.eq("TRUE")
+      expect(trueAndFalseButtons()[1].innerText).to.eq("FALSE")
+    })
+  })
+  describe('toggleTrueAndFalseButtons', function(){
+    it('changes hidden true and false buttons to displayed', function(){
+      trueAndFalseButtons().forEach(function(btn){
+        btn.classList.add('hide')
+      })
+      toggleTrueAndFalseButtons()
+      let btns = document.querySelector('.true-false-list').querySelectorAll('.btn')
+      expect(Array.from(btns[0].classList)).to.not.include('hide')
+      expect(Array.from(btns[1].classList)).to.not.include('hide')
+    })
+
+    it('changes displayed true and false buttons to hidden', function(){
+      trueAndFalseButtons().forEach(function(btn){
+        btn.classList.remove('hide')
+      })
+      toggleTrueAndFalseButtons()
+      let btns = document.querySelector('.true-false-list').querySelectorAll('.btn')
+      expect(Array.from(btns[0].classList)).to.include('hide')
+      expect(Array.from(btns[1].classList)).to.include('hide')
+    })
+  })
+
+  describe('displayQuestionOnClick', function(){
+    let event;
+    beforeEach(function(){
+      event = new MouseEvent('click', {
+        'view': window,
+        'bubbles': true,
+        'cancelable': true
+      });
+    })
+
+    it('it displays the question for after a click event to the button', function(){
+      displayQuestionOnClick()
+      let btn = document.querySelector('.btn')
+      btn.dispatchEvent(event)
+      let questionContainer = document.querySelector('.question-container')
+      expect(questionContainer.innerHTML).to.eq('Lightning never strikes in the same place twice')
+    })
+
+    it('also displays the true and false buttons', function(){
+      displayQuestionOnClick()
+      let btn = document.querySelector('.btn')
+      btn.dispatchEvent(event)
+      let questionContainer = document.querySelector('.question-container')
+      let btns = document.querySelector('.true-false-list').querySelectorAll('.btn')
+      setTimeout(function(){
+        expect(Array.from(btns[0].classList)).to.not.include('hide')
+        expect(Array.from(btns[1].classList)).to.not.include('hide')
+      }, 500)
+    })
+  })
+})
